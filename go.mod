@@ -1,4 +1,4 @@
-module github.com/haluz/user-notify-test
+module github.com/haluz/user-tcp-test
 
 go 1.15
 

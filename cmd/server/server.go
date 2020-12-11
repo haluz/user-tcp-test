@@ -5,8 +5,8 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/haluz/user-notify-test/repo"
-	"github.com/haluz/user-notify-test/server"
+	"github.com/haluz/user-tcp-test/repo"
+	"github.com/haluz/user-tcp-test/server"
 	"github.com/sirupsen/logrus"
 )
 

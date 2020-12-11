@@ -2,7 +2,7 @@ package repo
 
 import (
 	"encoding/json"
-	"github.com/haluz/user-notify-test/model"
+	"github.com/haluz/user-tcp-test/model"
 )
 
 type FriendshipRepo struct {

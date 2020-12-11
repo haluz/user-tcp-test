@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/haluz/user-notify-test/client"
+	"github.com/haluz/user-tcp-test/client"
 	"os"
 	"strconv"
 )
