@@ -12,6 +12,10 @@ import (
 
 func main() {
 	level := os.Getenv("LOG_LEVEL")
+	if level == "" {
+		level = "INFO"
+	}
+
 	l, err := logrus.ParseLevel(level)
 	if err != nil {
 		logrus.Fatalln(err.Error())
