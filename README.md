@@ -22,6 +22,6 @@ To run one of 4 clients use:
 ```
 make user<n>
 ```
-where <n> is from 1 to 4.
+where N is from 1 to 4.
 
 User `Ctrl+C` to stop server or client.
