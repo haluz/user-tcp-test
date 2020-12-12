@@ -98,12 +98,20 @@ func (s *Server) handleConnection(conn net.Conn, loginReq loginRequest) {
 		for {
 			select {
 			case status := <-c.friendsStatus:
-				logrus.WithField("userID", c.userID).Debug("flush message " + status)
 
-				_, err := w.WriteString(status + "\n")
+				data, err := json.Marshal(status)
+				if err != nil {
+					logrus.WithError(err).Error("failed to marshal status")
+					continue
+				}
+
+				_, err = w.Write(data)
 				if err != nil {
 					logrus.WithError(err).Error("failed to write status")
+					continue
 				}
+
+				w.WriteString("\n")
 				w.Flush()
 			case <-c.done:
 				break loop
@@ -134,8 +142,8 @@ func (s *Server) handleConnection(conn net.Conn, loginReq loginRequest) {
 	}()
 }
 
-func (s *Server) notifyStatus(userID int, status string) {
-	friends, err := s.fr.Friends(userID)
+func (s *Server) notifyStatus(status userStatus) {
+	friends, err := s.fr.Friends(status.UserId)
 	if err != nil {
 		logrus.WithError(err).Error("failed to get friends")
 		return
@@ -151,14 +159,14 @@ func (s *Server) notifyStatus(userID int, status string) {
 	s.mutex.RUnlock()
 
 	for _, conn := range conns {
-		go conn.sendStatus(userID, status)
+		go conn.sendStatus(status)
 	}
 }
 
 func (s *Server) addUserConn(loginReq loginRequest) *connection {
 	c := &connection{
 		userID:        loginReq.UserID,
-		friendsStatus: make(chan string),
+		friendsStatus: make(chan userStatus),
 		done:          make(chan struct{}),
 	}
 
@@ -166,7 +174,10 @@ func (s *Server) addUserConn(loginReq loginRequest) *connection {
 	s.connections[loginReq.UserID] = c
 	s.mutex.Unlock()
 
-	s.notifyStatus(loginReq.UserID, "online")
+	s.notifyStatus(userStatus{
+		UserId: loginReq.UserID,
+		Online: true,
+	})
 
 	return c
 }
@@ -180,5 +191,8 @@ func (s *Server) removeUserConn(userID int) {
 	s.mutex.Unlock()
 	logrus.WithField("userID", userID).Info("user logged out")
 
-	go s.notifyStatus(userID, "offline")
+	go s.notifyStatus(userStatus{
+		UserId: userID,
+		Online: false,
+	})
 }

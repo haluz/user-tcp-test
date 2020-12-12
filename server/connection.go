@@ -1,20 +1,14 @@
 package server
 
-import (
-	"fmt"
-)
-
 type connection struct {
 	userID        int
-	friendsStatus chan string
+	friendsStatus chan userStatus
 	done          chan struct{}
 }
 
-func (c *connection) sendStatus(id int, status string) {
-	msg := fmt.Sprintf("%d is %s", id, status)
-
+func (c *connection) sendStatus(status userStatus) {
 	select {
-	case c.friendsStatus <- msg:
+	case c.friendsStatus <- status:
 	case <-c.done:
 		return
 	}
